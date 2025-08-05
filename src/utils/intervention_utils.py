@@ -6,16 +6,23 @@ import numpy as np
 import re
 
 from datasets import Dataset
-from methods.distributed_alignment_search import LowRankRotatedSpaceIntervention
-from methods.pca import PCARotatedSpaceIntervention
-from methods.sparse_autoencoder import AutoencoderIntervention
-import pyvene as pv
 import torch
 from tqdm.auto import tqdm
 from torch.utils.data import DataLoader
 from torch.nn import CrossEntropyLoss
-from utils.dataset_utils import get_dataloader, get_label_offset
 
+
+from time_in_language_models_current.ravel.src.methods.distributed_alignment_search import LowRankRotatedSpaceIntervention
+from time_in_language_models_current.ravel.src.methods.pca import PCARotatedSpaceIntervention
+from time_in_language_models_current.ravel.src.methods.sparse_autoencoder import AutoencoderIntervention
+from time_in_language_models_current.ravel.src.utils.dataset_utils import get_dataloader, get_label_offset
+
+# import pyvene as pv
+from time_in_language_models_current.pyvene.pyvene import (
+  IntervenableConfig,
+  RepresentationConfig,
+  IntervenableModel
+)
 
 def get_intervention_config(model_type,
                             intervention_representations,
@@ -33,10 +40,10 @@ def get_intervention_config(model_type,
         intervention_units if intervention_units is not None else 'pos']
   assert len(intervention_representations) == len(layers)
   assert len(intervention_representations) == len(intervention_units)
-  inv_config = pv.IntervenableConfig(
+  inv_config = IntervenableConfig(
       model_type=model_type,
       representations=[
-          pv.RepresentationConfig(
+          RepresentationConfig(
               layer,  # layer
               intervention_representations[i],  # intervention repr
               intervention_units[i],  # intervention unit
@@ -301,7 +308,7 @@ def load_intervenable_with_pca(model, pca_param_path):
                                        layer,
                                        PCARotatedSpaceIntervention,
                                        num_unit=1)
-  intervenable = pv.IntervenableModel(inv_config, model)
+  intervenable = IntervenableModel(inv_config, model)
   intervenable.set_device("cuda")
   intervenable.disable_model_gradients()
   key = list(intervenable.interventions)[0]
@@ -317,7 +324,7 @@ def load_intervenable_with_autoencoder(model, autoencoder, inv_dims, layer):
                                        layer,
                                        AutoencoderIntervention,
                                        num_unit=1)
-  intervenable = pv.IntervenableModel(inv_config, model)
+  intervenable = IntervenableModel(inv_config, model)
   intervenable.set_device("cuda")
   intervenable.disable_model_gradients()
   for k in intervenable.interventions:
@@ -355,7 +362,7 @@ def load_intervenable(base_model, pretrained_weight_or_path):
   inv_config = get_intervention_config(type(base_model), "block_output", layers,
                                        LowRankRotatedSpaceIntervention,
                                        intervention_dimension=0)
-  intervenable = pv.IntervenableModel(inv_config, base_model)
+  intervenable = IntervenableModel(inv_config, base_model)
   intervenable.set_device("cuda")
   intervenable.disable_model_gradients()
   for k, v in rotate_layers.items():

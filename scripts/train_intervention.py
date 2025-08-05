@@ -2,18 +2,23 @@ import collections
 import numpy as np
 import re
 
+# import pyvene as pv
+from time_in_language_models_current.pyvene.pyvene import (
+  IntervenableModel, 
+  count_parameters
+)
+
 from datasets import concatenate_datasets
-from methods.distributed_alignment_search import LowRankRotatedSpaceIntervention
-from methods.differential_binary_masking import DifferentialBinaryMasking
-import pyvene as pv
 import torch
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm, trange
 from transformers import get_scheduler
-from utils.dataset_utils import get_multitask_dataloader
-from utils.intervention_utils import train_intervention_step, eval_with_interventions, get_intervention_config, remove_all_forward_hooks, remove_invalid_token_id
-from utils.metric_utils import compute_metrics, compute_cross_entropy_loss
 
+from time_in_language_models_current.ravel.src.methods.distributed_alignment_search import LowRankRotatedSpaceIntervention
+from time_in_language_models_current.ravel.src.methods.differential_binary_masking import DifferentialBinaryMasking
+from time_in_language_models_current.ravel.src.utils.dataset_utils import get_multitask_dataloader
+from time_in_language_models_current.ravel.src.utils.intervention_utils import train_intervention_step, eval_with_interventions, get_intervention_config, remove_all_forward_hooks, remove_invalid_token_id
+from time_in_language_models_current.ravel.src.utils.metric_utils import compute_metrics, compute_cross_entropy_loss
 
 def train_intervention(config, model, tokenizer, split_to_dataset):
   print('Training Tasks: %s' % config['training_tasks'])
@@ -66,7 +71,7 @@ def train_intervention(config, model, tokenizer, split_to_dataset):
       config['intervenable_config']['intervenable_layer'],
       config['intervenable_config']['intervenable_interventions_type'],
       intervention_dimension=config['intervention_dimension'])
-  intervenable = pv.IntervenableModel(intervenable_config, model)
+  intervenable = IntervenableModel(intervenable_config, model)
   intervenable.set_device(model.device)
   intervenable.disable_model_gradients()
 
@@ -88,7 +93,7 @@ def train_intervention(config, model, tokenizer, split_to_dataset):
                             optimizer=optimizer,
                             num_training_steps=num_epoch *
                             len(train_dataloader))
-  print("Model trainable parameters: ", pv.count_parameters(intervenable.model))
+  print("Model trainable parameters: ", count_parameters(intervenable.model))
   print("Intervention trainable parameters: ", intervenable.count_parameters())
   temperature_schedule = None
   if (config['intervenable_config']['intervenable_interventions_type'] ==

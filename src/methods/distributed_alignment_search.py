@@ -1,10 +1,13 @@
 """Define a featurizer and features with low-rank parameterized DAS."""
 
-import pyvene as pv
+# import pyvene as pv
+from time_in_language_models_current.pyvene.pyvene import (
+  TrainableIntervention
+)
 import torch
 
-
-class LowRankRotatedSpaceIntervention(pv.TrainableIntervention):
+class LowRankRotatedSpaceIntervention(TrainableIntervention):
+# class LowRankRotatedSpaceIntervention(TrainableIntervention):
   """Intervene in the rotated subspace defined by (low-rank) DAS."""
 
   def __init__(self, embed_dim, **kwargs):

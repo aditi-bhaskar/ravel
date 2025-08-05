@@ -2,7 +2,10 @@
 
 import numpy as np
 
-import pyvene as pv
+# import pyvene as pv
+from time_in_language_models_current.pyvene.pyvene import (
+  TrainableIntervention
+)
 from sklearn.decomposition import PCA
 import torch
 
@@ -22,7 +25,7 @@ def compute_principal_component(features, n_components):
   return {'mean': pca_mean, 'std': pca_std, 'components': pca.components_}
 
 
-class PCARotatedSpaceIntervention(pv.TrainableIntervention):
+class PCARotatedSpaceIntervention(TrainableIntervention):
   """Intervene in the rotated subspace defined by principal components."""
 
   def __init__(self, **kwargs):

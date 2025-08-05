@@ -3,9 +3,11 @@
 Adapted from https://colab.research.google.com/drive/1u8larhpxy8w4mMsJiSBddNOzFGj7_RTn?usp=sharing#scrollTo=Kn1E_44gCa-Z.
 """
 
-import pyvene as pv
+# import pyvene as pv
+from time_in_language_models_current.pyvene.pyvene import (
+  TrainableIntervention
+)
 import torch
-
 
 class SparseAutoencoder(torch.nn.Module):
   """Sparse Autoencoder with a single-layer encoder and a single-layer decoder."""
@@ -48,7 +50,7 @@ class SparseAutoencoder(torch.nn.Module):
     return self.autoencoder_losses
 
 
-class AutoencoderIntervention(pv.TrainableIntervention):
+class AutoencoderIntervention(TrainableIntervention):
   """Intervene in the latent space of an autoencoder."""
 
   def __init__(self, embed_dim, **kwargs):

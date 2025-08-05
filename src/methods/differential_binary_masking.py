@@ -1,10 +1,13 @@
 """Define a featurizer and features with Differential Binary Masking."""
 
-import pyvene as pv
+# import pyvene as pv
+from time_in_language_models_current.pyvene.pyvene import (
+  TrainableIntervention
+)
 import torch
 
 
-class DifferentialBinaryMasking(pv.TrainableIntervention):
+class DifferentialBinaryMasking(TrainableIntervention):
   """Intervene in the axis-aligned subspace defined by a binary mask."""
 
   def __init__(self, embed_dim, **kwargs):
