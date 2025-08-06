@@ -80,9 +80,13 @@ def train_intervention(config, model, tokenizer, split_to_dataset):
   regularization_coefficient = config['regularization_coefficient']
   optimizer_params = []
   for k, v in intervenable.interventions.items():
-    if isinstance(v[0], LowRankRotatedSpaceIntervention):
+    print(type(v), v)
+
+    # if isinstance(v[0], LowRankRotatedSpaceIntervention):
+    if isinstance(v, LowRankRotatedSpaceIntervention):
       optimizer_params += [{'params': v[0].rotate_layer.parameters()}]
-    elif isinstance(v[0], DifferentialBinaryMasking):
+    # elif isinstance(v[0], DifferentialBinaryMasking):
+    elif isinstance(v, DifferentialBinaryMasking):
       optimizer_params += [{'params': v[0].parameters()}]
     else:
       raise NotImplementedError
@@ -103,7 +107,8 @@ def train_intervention(config, model, tokenizer, split_to_dataset):
                                           num_epoch * len(train_dataloader) +
                                           1).to(torch.bfloat16).to(model.device)
     for k, v in intervenable.interventions.items():
-      if isinstance(v[0], DifferentialBinaryMasking):
+      if isinstance(v, DifferentialBinaryMasking):
+    #   if isinstance(v[0], DifferentialBinaryMasking):
         intervenable.interventions[k][0].set_temperature(
             temperature_schedule[scheduler._step_count])
 
